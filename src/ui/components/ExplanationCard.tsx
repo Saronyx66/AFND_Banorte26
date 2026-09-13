@@ -30,6 +30,10 @@ export function ExplanationCard({ node }: A2UIComponentProps) {
 
   return (
     <div className="a2ui-card a2ui-explanation">
+      {/* D30: firma visual de Pixy (D18); no entra en el texto que se lee en voz. */}
+      <span className="a2ui-explanation-firma" aria-hidden="true">
+        Pixy
+      </span>
       <div className="a2ui-explanation-cabecera">
         {title ? <h3>{title}</h3> : <span aria-hidden="true" />}
         {textoVoz && <BotonVoz estado={estadoVoz} continuo={continuo} onClick={alternarVoz} />}

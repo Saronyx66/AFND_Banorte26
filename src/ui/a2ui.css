@@ -1,39 +1,59 @@
-/* Tokens de marca — LOTE V cierre visual. Fijos en :root, override de
-   perfil en [data-profile="sencillo"]. Logo Banorte solo en el header (D26).
+/* Tokens de marca — LOTE V cierre visual + LOTE UI rediseño (D30).
+   Fijos en :root, override de perfil en [data-profile="sencillo"] y
+   [data-profile="detallado"]. Logo Banorte solo en el header (D26).
    Glassmorfismo por tokens --glass-* en normal/detallado; en sencillo las
-   tarjetas son opacas y de alto contraste (D27). */
+   tarjetas son opacas y de alto contraste (D27). D30: todo lo que cambia
+   aquí es presentación; el catálogo de A2UI.md sección 4 no se toca. */
 
 :root {
   --brand: #e4001b;
   --brand-deep: #b3001b;
+  --brand-tint: rgba(228, 0, 27, 0.08);
+  --brand-tint-fuerte: rgba(228, 0, 27, 0.14);
   --bg: #efefef;
   --card: #ffffff;
   --action: #3c3c3c;
+  --action-deep: #262626;
   --accent: #ffd84d;
   --positive: #1e7a46;
+  --positive-tint: #e2f3e8;
   --alert: #b4460e;
+  --alert-tint: #fdeee4;
   --text: #1a1a1a;
   --muted: #6b6b6b;
   --label: #6e6e6e; /* 4.9:1 sobre blanco; el #8a8a8a anterior daba 3.4:1 y no pasaba AA */
   --border: #e2e2e2;
+  --border-fuerte: #cfcfcf;
   /* Barras de porcentaje en ComparisonTable (D29): relleno rojo sobre pista gris,
      3.9:1 como elemento gráfico (AA pide 3:1). */
   --bar-bg: #e6e6e6;
   --bar-fill: var(--brand);
   --bar-alto: 6px;
-  --radius-card: 16px;
-  --shadow-card: 0 8px 24px rgba(26, 26, 26, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --radius-card: 20px;
+  --radius-control: 12px;
+  --radius-pill: 999px;
+  --shadow-card: 0 10px 30px rgba(26, 26, 26, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-card-hover: 0 14px 36px rgba(26, 26, 26, 0.11), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-flotante: 0 10px 28px rgba(228, 0, 27, 0.28), 0 2px 6px rgba(0, 0, 0, 0.18);
+
+  /* Anillo de foco (D30): visible sobre vidrio y sobre rojo. */
+  --focus-ring: 0 0 0 3px #ffffff, 0 0 0 6px var(--brand);
+  --focus-ring-en-rojo: 0 0 0 3px var(--brand), 0 0 0 6px #ffffff;
+
+  /* Movimiento: una sola duración para hover/focus; se apaga con reduced-motion. */
+  --dur: 180ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 
   /* Glassmorfismo (D27). --card-bg arranca en el fallback casi opaco; el
      bloque @supports de abajo lo cambia al vidrio solo si el navegador
      tiene backdrop-filter. En sencillo se pisa a blanco sólido. */
-  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-bg: rgba(255, 255, 255, 0.72);
   --glass-bg-fallback: rgba(255, 255, 255, 0.92);
-  --glass-border: rgba(255, 255, 255, 0.55);
-  --glass-blur: 12px;
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-blur: 14px;
   --card-bg: var(--glass-bg-fallback);
   --card-blur: none;
-  --fondo-app: linear-gradient(180deg, #f6f6f6 0%, var(--bg) 55%, #e8e8e8 100%);
+  --fondo-app: linear-gradient(180deg, #f8f7f7 0%, var(--bg) 55%, #e6e6e6 100%);
 
   /* Espaciado, escala base 4/8/12/16/24/32 */
   --space-1: 4px;
@@ -44,6 +64,7 @@
   --space-6: 32px;
 
   --escala-texto: 1;
+  --ancho-main: 680px; /* columna de contenido y barra de entrada */
   --borde-card: 1px solid var(--glass-border);
 
   --label-size: 12px;
@@ -71,13 +92,22 @@
   --space-5: calc(24px * 1.4);
   --space-6: calc(32px * 1.4);
 
-  --escala-texto: 1.4;
+  /* D30: sencillo sube a 1.5 y ensancha la columna a 960 px: letra más
+     grande y, por el ancho, más texto por pantalla en vez de más scroll. */
+  --escala-texto: 1.5;
+  --ancho-main: 960px;
   --borde-card: 2px solid var(--text);
+  --border: #bdbdbd;
+  --border-fuerte: #8a8a8a;
   --shadow-card: none;
+  --shadow-card-hover: none;
+  --radius-card: 16px;
+  --radius-control: 10px;
   /* D27: accesibilidad primero — nada de vidrio en sencillo */
   --card-bg: var(--card);
   --card-blur: none;
   --fondo-app: var(--bg);
+  --focus-ring: 0 0 0 4px #ffffff, 0 0 0 8px var(--text);
 
   --label-size: 17px;
   --label-tracking: 0.1em;
@@ -97,6 +127,7 @@
 [data-profile="detallado"] {
   --escala-texto: 0.95;
   --boton-alto: 40px;
+  --radius-card: 16px;
   --cols-fila: 4;
 }
 
@@ -110,8 +141,22 @@
   color: var(--text);
   font-family: var(--a2ui-fuente-montserrat, "Montserrat", system-ui, sans-serif);
   font-size: calc(1rem * var(--escala-texto));
+  line-height: 1.45;
   position: relative;
   isolation: isolate; /* las manchas (z-index -1) quedan entre el fondo y el contenido */
+  -webkit-font-smoothing: antialiased;
+}
+
+.a2ui-root *,
+.a2ui-root *::before,
+.a2ui-root *::after {
+  box-sizing: border-box;
+}
+
+/* Foco visible en todo lo que se puede operar con teclado (D30). */
+.a2ui-root :is(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 /* Manchas difusas rojo/gris detrás del contenido: le dan algo que
@@ -175,29 +220,47 @@
   }
 }
 
+/* Header */
+
 .a2ui-header {
-  background: var(--brand);
+  /* Extremo claro #e8101f: blanco encima da 4.64:1 (AA). Más claro no pasa. */
+  background: linear-gradient(100deg, var(--brand-deep) 0%, var(--brand) 55%, #e8101f 100%);
   color: #fff;
-  padding: 12px var(--space-5);
+  padding: 18px var(--space-5);
+  min-height: 72px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-3);
   font-weight: 600;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  position: relative;
+  box-shadow: 0 4px 18px rgba(179, 0, 27, 0.25);
+  position: sticky;
+  top: 0;
   z-index: 10;
+}
+
+[data-profile="sencillo"] .a2ui-header {
+  background: var(--brand);
+  box-shadow: none;
+  border-bottom: 2px solid #ffffff;
+}
+
+.a2ui-header :is(button, a):focus-visible {
+  box-shadow: var(--focus-ring-en-rojo);
 }
 
 .a2ui-header-marca {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  flex: 1 1 auto;
   min-width: 0;
+  overflow: hidden; /* el saludo se recorta con elipsis antes que pisar el chip */
 }
 
 .a2ui-header-logo {
   display: block;
-  height: 24px; /* D26: logo oficial blanco sobre fondo rojo */
+  height: 30px; /* D26: logo oficial blanco sobre fondo rojo */
   width: auto;
   flex-shrink: 0;
 }
@@ -205,59 +268,137 @@
 .a2ui-header-separador {
   display: block;
   width: 1px;
-  height: 18px;
-  background: rgba(255, 255, 255, 0.35);
+  height: 28px;
+  background: rgba(255, 255, 255, 0.4);
   flex-shrink: 0;
 }
 
 .a2ui-header-saludo {
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
   color: #ffffff;
   white-space: nowrap;
+}
+
+.a2ui-header-saludo > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.a2ui-header-saludo-hora {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffffff; /* sin opacidad: sobre rojo, blanco al 85 % no llega a 4.5:1 */
+}
+
+.a2ui-header-saludo-nombre {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .a2ui-header-info {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  flex-shrink: 0;
+  flex: none;
 }
 
+/* Chip de la tarjeta: es un botón (D31) que abre la tarjeta digital. */
 .a2ui-header-tarjeta {
-  letter-spacing: 0.08em;
-  font-weight: 500;
-  font-size: 0.82rem;
-  background: rgba(0, 0, 0, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  padding: 4px 12px;
-  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  letter-spacing: 0.1em;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
   white-space: nowrap;
-  color: rgba(255, 255, 255, 0.95);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+  color: #ffffff;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.14);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.a2ui-header-tarjeta:hover {
+  background: rgba(0, 0, 0, 0.28);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.a2ui-header-tarjeta:active {
+  transform: scale(0.97);
+}
+
+.a2ui-header-tarjeta:focus-visible {
+  box-shadow: var(--focus-ring-en-rojo);
+}
+
+.a2ui-header-tarjeta svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  opacity: 0.9;
 }
 
 [data-profile="sencillo"] .a2ui-header-logo {
-  height: 28px;
+  height: 34px;
 }
 
 [data-profile="sencillo"] .a2ui-header-separador {
-  height: 24px;
+  height: 34px;
   width: 2px;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.7);
 }
 
-[data-profile="sencillo"] .a2ui-header-saludo {
-  font-size: 1.15rem;
-  font-weight: 700;
+[data-profile="sencillo"] .a2ui-header-saludo-hora {
+  font-size: 0.9rem;
+}
+
+[data-profile="sencillo"] .a2ui-header-saludo-nombre {
+  font-size: 1.3rem;
+  font-weight: 800;
 }
 
 [data-profile="sencillo"] .a2ui-header-tarjeta {
   font-size: 1rem;
   border: 2px solid #ffffff;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.28);
   font-weight: 700;
+}
+
+[data-profile="sencillo"] .a2ui-header-tarjeta svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Sencillo en pantalla angosta: el logo y el nombre ceden antes que el chip. */
+@media (max-width: 700px) {
+  [data-profile="sencillo"] .a2ui-header-logo {
+    height: 26px;
+  }
+  [data-profile="sencillo"] .a2ui-header-separador {
+    height: 26px;
+  }
+  [data-profile="sencillo"] .a2ui-header-saludo-hora {
+    font-size: 0.72rem;
+  }
+  [data-profile="sencillo"] .a2ui-header-saludo-nombre {
+    font-size: 1.05rem;
+  }
+  [data-profile="sencillo"] .a2ui-header-tarjeta {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+  }
 }
 
 @media (max-width: 540px) {
@@ -270,35 +411,72 @@
   }
 
   .a2ui-header-logo {
-    height: 20px;
+    height: 24px;
   }
 
   .a2ui-header-separador {
-    height: 15px;
+    height: 22px;
   }
 
-  .a2ui-header-saludo {
-    font-size: 0.85rem;
+  .a2ui-header-saludo-hora {
+    font-size: 0.66rem;
+  }
+
+  .a2ui-header-saludo-nombre {
+    font-size: 1rem;
   }
 
   .a2ui-header-tarjeta {
-    font-size: 0.75rem;
-    padding: 3px 8px;
+    font-size: 0.76rem;
+    padding: 5px 10px;
+    min-height: 36px;
   }
 }
 
+/* Aviso de reconexión */
+
 .a2ui-aviso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
   background: var(--accent);
   color: var(--text);
   text-align: center;
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-4);
   font-size: 0.85em;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 9;
 }
+
+.a2ui-aviso::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text);
+  animation: a2ui-parpadeo 1s ease-in-out infinite;
+}
+
+@keyframes a2ui-parpadeo {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* Contenido */
 
 .a2ui-main {
   flex: 1;
-  padding: var(--space-4);
-  max-width: 640px;
+  /* Abajo: espacio para que la última tarjeta pase por encima de la burbuja de Pixy. */
+  padding: var(--space-5) var(--space-4) calc(var(--space-6) + 96px);
+  max-width: var(--ancho-main);
   width: 100%;
   margin: 0 auto;
   position: relative;
@@ -307,7 +485,85 @@
 .a2ui-column {
   display: flex;
   flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Entrada de las tarjetas: cada pantalla nueva sube unos píxeles. */
+.a2ui-column > * {
+  animation: a2ui-entrada 320ms var(--ease) both;
+}
+
+.a2ui-column > :nth-child(2) {
+  animation-delay: 40ms;
+}
+
+.a2ui-column > :nth-child(3) {
+  animation-delay: 80ms;
+}
+
+.a2ui-column > :nth-child(n + 4) {
+  animation-delay: 120ms;
+}
+
+@keyframes a2ui-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Esqueleto mientras llega la primera pantalla (sustituye a "Cargando…"). */
+
+.a2ui-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.a2ui-skeleton-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  border: var(--borde-card);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
   gap: var(--space-3);
+}
+
+.a2ui-skeleton-linea {
+  height: 0.9em;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, #e5e5e5 0%, #f3f3f3 50%, #e5e5e5 100%);
+  background-size: 200% 100%;
+  animation: a2ui-brillo 1.4s ease-in-out infinite;
+}
+
+.a2ui-skeleton-linea--titulo {
+  width: 45%;
+  height: 1.2em;
+}
+
+.a2ui-skeleton-linea--corta {
+  width: 70%;
+}
+
+.a2ui-skeleton-linea--valor {
+  width: 40%;
+  height: 1.8em;
+  align-self: flex-end;
+}
+
+@keyframes a2ui-brillo {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
 }
 
 /* Tarjetas */
@@ -320,12 +576,13 @@
   box-shadow: var(--shadow-card);
   border: var(--borde-card);
   padding: var(--space-4) var(--space-5);
+  transition: box-shadow var(--dur) var(--ease);
 }
 
 /* El modal va sobre el overlay oscuro: más opaco para que el texto no
    pierda contraste, sigue siendo vidrio. */
 .a2ui-modal {
-  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-bg: rgba(255, 255, 255, 0.94);
 }
 
 [data-profile="sencillo"] .a2ui-modal {
@@ -336,9 +593,58 @@
 
 .a2ui-label {
   font-size: var(--label-size);
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: var(--label-tracking);
   color: var(--label-color);
+}
+
+/* Botones — primario gris oscuro (LOTE-V), secundario en vidrio */
+
+.a2ui-boton-primario,
+.a2ui-boton-secundario {
+  flex: 1;
+  min-height: var(--boton-alto);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-control);
+  border: none;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.a2ui-boton-primario {
+  background: var(--action);
+  color: #fff;
+  width: 100%;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+}
+
+.a2ui-boton-primario:hover {
+  background: var(--action-deep);
+}
+
+.a2ui-boton-primario:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+}
+
+.a2ui-boton-secundario {
+  background: transparent;
+  color: var(--action);
+  border: 1.5px solid var(--border-fuerte);
+}
+
+.a2ui-boton-secundario:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: var(--action);
+}
+
+[data-profile="sencillo"] .a2ui-boton-secundario {
+  border-width: 2px;
+  border-color: var(--text);
+  color: var(--text);
 }
 
 /* StatCard */
@@ -346,13 +652,38 @@
 .a2ui-statcard {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Barra de tono en el borde izquierdo: neutral = gris, warn = alerta, good = positivo */
+.a2ui-statcard::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: var(--space-4);
+  bottom: var(--space-4);
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--border-fuerte);
+}
+
+.a2ui-statcard.a2ui-tone-warn::before {
+  background: var(--alert);
+}
+
+.a2ui-statcard.a2ui-tone-good::before {
+  background: var(--positive);
 }
 
 .a2ui-value {
-  font-size: 1.5em;
-  font-weight: 700;
+  font-size: 1.85em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .a2ui-tone-warn .a2ui-value {
@@ -363,38 +694,98 @@
   color: var(--positive);
 }
 
+[data-profile="sencillo"] .a2ui-value {
+  font-size: 1.7em;
+}
+
 /* ComparisonTable */
+
+.a2ui-comparison {
+  padding: var(--space-2) 0 var(--space-2);
+}
+
+.a2ui-tabla-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 var(--space-4);
+}
 
 .a2ui-comparison table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .a2ui-comparison th {
-  text-align: left;
+  text-align: right;
   font-size: var(--label-size);
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: var(--label-tracking);
   color: var(--label-color);
-  padding-bottom: var(--space-2);
+  padding: var(--space-2) var(--space-2) var(--space-2);
+  white-space: nowrap;
+}
+
+.a2ui-comparison th:first-child {
+  text-align: left;
 }
 
 .a2ui-comparison td {
-  padding: var(--space-2) var(--space-1);
+  padding: var(--space-3) var(--space-2);
   border-top: 1px solid var(--border);
   text-align: right;
+  vertical-align: baseline; /* el número del porcentaje queda a nivel de sus vecinas */
 }
 
 .a2ui-comparison td:first-child {
   text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.a2ui-comparison tr {
+.a2ui-comparison tbody tr {
+  transition: background var(--dur) var(--ease);
+}
+
+/* Solo las tablas con action son un selector: cursor, hover y foco. */
+.a2ui-comparison--activa tbody tr {
   cursor: pointer;
 }
 
-.a2ui-comparison tr.a2ui-selected {
-  background: rgba(228, 0, 27, 0.08);
+.a2ui-comparison--activa tbody tr:hover {
+  background: rgba(0, 0, 0, 0.035);
+}
+
+.a2ui-comparison--activa tbody tr:focus-visible {
+  outline: none;
+  box-shadow: inset var(--focus-ring);
+}
+
+.a2ui-comparison tbody tr.a2ui-selected {
+  background: var(--brand-tint);
+}
+
+.a2ui-comparison--activa tbody tr.a2ui-selected:hover {
+  background: var(--brand-tint-fuerte);
+}
+
+.a2ui-comparison tbody tr.a2ui-selected td {
+  border-top-color: rgba(228, 0, 27, 0.25);
+}
+
+.a2ui-comparison tbody tr.a2ui-selected td:first-child {
+  box-shadow: inset 4px 0 0 var(--brand);
+  color: var(--brand-deep);
+}
+
+[data-profile="sencillo"] .a2ui-comparison tbody tr.a2ui-selected {
+  background: #fdeaec;
+}
+
+[data-profile="sencillo"] .a2ui-comparison tbody tr.a2ui-selected td:first-child {
+  box-shadow: inset 6px 0 0 var(--brand);
 }
 
 .a2ui-comparison tr.a2ui-atenuada {
@@ -413,12 +804,6 @@
 
 .a2ui-percent-texto {
   white-space: nowrap; /* "20.75 %" en una línea aunque la columna sea angosta */
-}
-
-/* Las celdas se alinean por línea base: el número del porcentaje queda a
-   nivel de las celdas vecinas y la barra cuelga debajo. */
-.a2ui-comparison td {
-  vertical-align: baseline;
 }
 
 .a2ui-barra {
@@ -443,21 +828,75 @@
 }
 
 .a2ui-badge {
-  display: inline-block;
-  margin-left: 0.4em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 0.5em;
   background: var(--positive);
   color: #fff;
-  font-size: 0.7em;
-  padding: 0.1em 0.6em;
-  border-radius: 999px;
+  font-size: 0.68em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.2em 0.65em;
+  border-radius: var(--radius-pill);
   vertical-align: middle;
+  white-space: nowrap;
+}
+
+.a2ui-badge svg {
+  width: 0.9em;
+  height: 0.9em;
+}
+
+/* Sencillo: el badge baja a su propia línea para que la primera columna no
+   ensanche la tabla y quepan más columnas sin scroll. */
+[data-profile="sencillo"] .a2ui-comparison td:first-child .a2ui-badge {
+  display: flex;
+  width: max-content;
+  margin: 6px 0 0;
+}
+
+[data-profile="sencillo"] .a2ui-comparison th,
+[data-profile="sencillo"] .a2ui-comparison td {
+  padding-left: 6px;
+  padding-right: 6px;
 }
 
 /* SliderControl */
 
 .a2ui-slider label {
-  display: block;
-  margin-bottom: var(--space-2);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  font-weight: 500;
+}
+
+.a2ui-slider-valor {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--brand-deep);
+  background: var(--brand-tint);
+  border-radius: var(--radius-pill);
+  padding: 0.15em 0.75em;
+  white-space: nowrap;
+}
+
+[data-profile="sencillo"] .a2ui-slider-valor {
+  color: var(--text);
+  background: #ececec;
+  border: 2px solid var(--text);
+}
+
+.a2ui-slider-extremos {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-1);
+  font-size: 0.78em;
+  color: var(--label-color);
+  font-variant-numeric: tabular-nums;
 }
 
 .a2ui-slider input[type="range"] {
@@ -465,11 +904,15 @@
   appearance: none;
   width: 100%;
   background: transparent;
+  cursor: pointer;
+  margin: 0;
+  display: block;
 }
 
+/* Pista con relleno hasta el valor (--pct la pone el componente; es presentación). */
 .a2ui-slider input[type="range"]::-webkit-slider-runnable-track {
   height: var(--slider-track-alto);
-  background: var(--slider-track-color);
+  background: linear-gradient(90deg, var(--slider-pulgar-color) 0 var(--pct, 0%), var(--slider-track-color) var(--pct, 0%) 100%);
   border-radius: 999px;
 }
 
@@ -481,13 +924,26 @@
   border-radius: 50%;
   background: var(--slider-pulgar-color);
   border: var(--slider-pulgar-borde);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
   margin-top: calc((var(--slider-pulgar) - var(--slider-track-alto)) / -2);
-  cursor: pointer;
+  cursor: grab;
+  transition: transform var(--dur) var(--ease);
+}
+
+.a2ui-slider input[type="range"]:active::-webkit-slider-thumb {
+  cursor: grabbing;
+  transform: scale(1.08);
 }
 
 .a2ui-slider input[type="range"]::-moz-range-track {
   height: var(--slider-track-alto);
   background: var(--slider-track-color);
+  border-radius: 999px;
+}
+
+.a2ui-slider input[type="range"]::-moz-range-progress {
+  height: var(--slider-track-alto);
+  background: var(--slider-pulgar-color);
   border-radius: 999px;
 }
 
@@ -497,25 +953,88 @@
   border-radius: 50%;
   background: var(--slider-pulgar-color);
   border: var(--slider-pulgar-borde);
-  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  cursor: grab;
+}
+
+.a2ui-slider input[type="range"]:focus-visible {
+  box-shadow: none;
+}
+
+.a2ui-slider input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow: var(--focus-ring);
+}
+
+.a2ui-slider input[type="range"]:focus-visible::-moz-range-thumb {
+  box-shadow: var(--focus-ring);
 }
 
 /* ExplanationCard */
 
+.a2ui-explanation-firma {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--space-2);
+  font-size: var(--label-size);
+  font-weight: 700;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--brand-deep);
+}
+
+.a2ui-explanation-firma::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand);
+  flex: none;
+}
+
 .a2ui-explanation h3 {
   margin: 0 0 var(--space-2);
+  font-size: 1.2em;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
 }
 
 .a2ui-explanation p {
   margin: 0 0 var(--space-2);
-  line-height: 1.4;
+  line-height: 1.55;
   color: var(--text);
 }
 
 .a2ui-explanation ul {
-  margin: 0;
-  padding-left: 1.1em;
-  color: var(--muted);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.a2ui-explanation li {
+  position: relative;
+  padding-left: 1.3em;
+  line-height: 1.45;
+}
+
+.a2ui-explanation li::before {
+  content: "";
+  position: absolute;
+  left: 0.2em;
+  top: 0.6em;
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+[data-profile="sencillo"] .a2ui-explanation li::before {
+  background: var(--text);
 }
 
 /* Bocina de lectura (D22) — affordance del shell dentro de ExplanationCard */
@@ -534,11 +1053,11 @@
 
 .a2ui-voz {
   flex: none;
-  width: 32px;
-  height: 32px;
-  margin: -4px -8px 0 0;
+  width: 36px;
+  height: 36px;
+  margin: -6px -10px 0 0;
   padding: 0;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 50%;
   background: transparent;
   color: var(--label);
@@ -546,14 +1065,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
 
-.a2ui-voz:hover,
-.a2ui-voz:focus-visible {
+.a2ui-voz:hover {
   color: var(--text);
-  background: var(--bg);
-  outline: none;
+  background: rgba(0, 0, 0, 0.05);
+  border-color: var(--border);
 }
 
 .a2ui-voz svg {
@@ -570,10 +1088,11 @@
 }
 
 [data-profile="sencillo"] .a2ui-voz {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   margin: -6px -10px 0 0;
   color: var(--text);
+  border-color: var(--text);
 }
 
 [data-profile="sencillo"] .a2ui-voz svg {
@@ -586,11 +1105,12 @@
 .a2ui-voz--auto {
   background: var(--brand);
   color: #fff;
+  border-color: var(--brand);
 }
 
-.a2ui-voz--auto:hover,
-.a2ui-voz--auto:focus-visible {
+.a2ui-voz--auto:hover {
   background: var(--brand-deep);
+  border-color: var(--brand-deep);
   color: #fff;
 }
 
@@ -622,73 +1142,81 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .a2ui-voz--cargando {
-    animation: none;
-    opacity: 0.5;
-  }
-  .a2ui-voz--auto.a2ui-voz--reproduciendo {
-    animation: none;
-    box-shadow: 0 0 0 3px rgba(228, 0, 27, 0.35);
-  }
-}
-
 /* ActionConfirmationModal */
 
 .a2ui-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(20, 20, 20, 0.5);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
-  z-index: 10;
+  z-index: 30;
+  animation: a2ui-fundido 200ms var(--ease) both;
+}
+
+@keyframes a2ui-fundido {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .a2ui-modal {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
+  padding: var(--space-5);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  animation: a2ui-entrada 260ms var(--ease) both;
+}
+
+.a2ui-modal h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 1.25em;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
 .a2ui-modal-resumen {
   list-style: none;
-  margin: var(--space-3) 0;
+  margin: var(--space-3) 0 var(--space-4);
   padding: 0;
+  border-top: 1px solid var(--border);
 }
 
 .a2ui-modal-resumen li {
   display: flex;
   justify-content: space-between;
-  padding: var(--space-2) 0;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
   border-bottom: 1px solid var(--border);
+}
+
+.a2ui-modal-resumen li > span:first-child {
+  color: var(--label-color);
+  font-size: 0.92em;
+}
+
+.a2ui-modal-resumen li > span:last-child {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 .a2ui-modal-acciones {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
-.a2ui-boton-primario,
-.a2ui-boton-secundario {
-  flex: 1;
-  min-height: var(--boton-alto);
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.a2ui-boton-primario {
-  background: var(--action);
-  color: #fff;
-  width: 100%;
-}
-
-.a2ui-boton-secundario {
-  background: var(--bg);
-  color: var(--action);
-  border: 1px solid var(--border);
+[data-profile="sencillo"] .a2ui-modal-acciones {
+  flex-direction: column-reverse;
 }
 
 /* ScheduleList */
@@ -700,16 +1228,82 @@
 }
 
 .a2ui-schedule-item {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-2);
-  padding: var(--space-2) 0;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
   border-bottom: 1px solid var(--border);
 }
 
+.a2ui-schedule-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.a2ui-schedule-item:first-child {
+  padding-top: 0;
+}
+
+.a2ui-schedule-fecha {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  min-width: 0;
+}
+
+.a2ui-schedule-fecha svg {
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+  color: var(--label-color);
+}
+
+.a2ui-schedule-monto {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .a2ui-estado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 5.5em;
   color: var(--muted);
-  font-size: 0.85em;
+  background: #ececec;
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.3em 0.7em;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.a2ui-estado--bien {
+  color: var(--positive);
+  background: var(--positive-tint);
+}
+
+.a2ui-estado--alerta {
+  color: var(--alert);
+  background: var(--alert-tint);
+}
+
+[data-profile="sencillo"] .a2ui-estado {
+  border: 2px solid currentColor;
+}
+
+@media (max-width: 400px) {
+  .a2ui-schedule-item {
+    grid-template-columns: 1fr auto;
+  }
+  .a2ui-estado {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
 }
 
 /* SuggestionChips */
@@ -726,33 +1320,74 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
   background: none;
   border: none;
+  padding: var(--space-1);
+  border-radius: var(--radius-control);
   cursor: pointer;
   color: var(--text);
-  max-width: 5.5rem;
+  font: inherit;
+  width: 6.25rem;
+  transition: transform var(--dur) var(--ease);
 }
 
 .a2ui-chip-icono {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
   background: var(--card-bg);
   -webkit-backdrop-filter: var(--card-blur);
   backdrop-filter: var(--card-blur);
   box-shadow: var(--shadow-card);
   border: var(--borde-card);
+  color: var(--brand);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.a2ui-chip-icono svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.a2ui-chip:hover .a2ui-chip-icono {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.a2ui-chip:active .a2ui-chip-icono {
+  transform: translateY(0) scale(0.96);
 }
 
 .a2ui-chip-label {
-  font-size: 0.75em;
+  font-size: 0.78em;
+  font-weight: 600;
   text-align: center;
-  line-height: 1.2;
+  line-height: 1.25;
+}
+
+[data-profile="sencillo"] .a2ui-chip {
+  width: 8.5rem;
+}
+
+[data-profile="sencillo"] .a2ui-chip-icono {
+  width: 3.4rem;
+  height: 3.4rem;
+  color: var(--text);
+}
+
+[data-profile="sencillo"] .a2ui-chip:hover .a2ui-chip-icono {
+  background: var(--text);
+  color: #fff;
+}
+
+[data-profile="detallado"] .a2ui-chips {
+  justify-content: flex-start;
 }
 
 /* Entrada de texto */
@@ -761,42 +1396,105 @@
   position: sticky;
   bottom: 0;
   display: flex;
-  gap: var(--space-2);
+  justify-content: center;
   padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(239, 239, 239, 0) 0%, rgba(239, 239, 239, 0.9) 35%);
+  z-index: 15;
+}
+
+[data-profile="sencillo"] .a2ui-textinput {
+  background: var(--bg);
+  border-top: 2px solid var(--text);
+}
+
+.a2ui-textinput-campo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: var(--ancho-main);
+  padding: 6px 6px 6px var(--space-4);
   background: var(--card-bg);
   -webkit-backdrop-filter: var(--card-blur);
   backdrop-filter: var(--card-blur);
-  border-top: 1px solid var(--border);
+  border: var(--borde-card);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
 
-.a2ui-textinput input {
+.a2ui-textinput-campo:focus-within {
+  box-shadow: var(--shadow-card-hover), 0 0 0 2px rgba(228, 0, 27, 0.25);
+}
+
+[data-profile="sencillo"] .a2ui-textinput-campo {
   background: var(--card);
+  border: 2px solid var(--text);
+  border-radius: var(--radius-control);
+  padding: 6px 6px 6px var(--space-3);
+}
+
+[data-profile="sencillo"] .a2ui-textinput-campo:focus-within {
+  box-shadow: 0 0 0 3px var(--text);
 }
 
 .a2ui-textinput input {
   flex: 1;
-  min-height: var(--boton-alto);
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  padding: 0 var(--space-3);
+  min-width: 0;
+  min-height: calc(var(--boton-alto) - 12px);
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
   font-size: 1em;
   color: var(--text);
 }
 
+.a2ui-textinput input::placeholder {
+  color: var(--muted);
+}
+
+.a2ui-root .a2ui-textinput input:focus-visible {
+  outline: none;
+  box-shadow: none; /* el anillo lo pinta el contenedor con :focus-within */
+}
+
 .a2ui-textinput button {
-  min-height: var(--boton-alto);
-  padding: 0 var(--space-4);
-  border-radius: 8px;
+  flex: none;
+  width: calc(var(--boton-alto) - 8px);
+  height: calc(var(--boton-alto) - 8px);
+  border-radius: 50%;
   border: none;
-  background: var(--action);
+  background: var(--brand);
   color: #fff;
-  font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dur) var(--ease), transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+
+.a2ui-textinput button svg {
+  width: 45%;
+  height: 45%;
+}
+
+.a2ui-textinput button:hover:not(:disabled) {
+  background: var(--brand-deep);
+}
+
+.a2ui-textinput button:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+[data-profile="sencillo"] .a2ui-textinput button {
+  border-radius: var(--radius-control);
+  background: var(--text);
 }
 
 .a2ui-textinput button:disabled,
 .a2ui-textinput input:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -805,7 +1503,7 @@
 .pixy-bubble {
   position: fixed;
   right: var(--space-4);
-  bottom: calc(var(--space-4) + 72px); /* encima de la entrada de texto */
+  bottom: calc(var(--space-4) + 76px); /* encima de la entrada de texto */
   width: 56px;
   height: 56px;
   z-index: 20;
@@ -814,21 +1512,27 @@
 [data-profile="sencillo"] .pixy-bubble {
   width: 72px;
   height: 72px;
+  bottom: calc(var(--space-4) + 96px);
 }
 
 .pixy-circulo {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: var(--brand);
+  background: radial-gradient(circle at 30% 30%, #ff5a6a 0%, var(--brand) 45%, var(--brand-deep) 100%);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 1.4em;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-flotante);
   animation: pixy-bob 4s ease-in-out infinite;
+}
+
+[data-profile="sencillo"] .pixy-circulo {
+  background: var(--brand);
+  border: 3px solid #fff;
 }
 
 .pixy-bubble--pensando .pixy-circulo,
@@ -915,7 +1619,204 @@
   }
 }
 
+/* Tarjeta digital (D31) — shell, se abre desde el chip del header */
+
+.tarjeta-modal {
+  max-width: 460px;
+}
+
+.tarjeta-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.tarjeta-cabecera h3 {
+  margin: 0;
+}
+
+.tarjeta-cerrar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  margin-right: -8px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.tarjeta-cerrar:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text);
+}
+
+.tarjeta-cerrar svg {
+  width: 20px;
+  height: 20px;
+}
+
+[data-profile="sencillo"] .tarjeta-cerrar {
+  width: 52px;
+  height: 52px;
+  color: var(--text);
+  border-color: var(--text);
+}
+
+/* La tarjeta física: proporción ISO 1.586, rojo Banorte, texto blanco. */
+.tarjeta {
+  position: relative;
+  aspect-ratio: 1.586;
+  width: 100%;
+  border-radius: 18px;
+  padding: 7% 7% 6%;
+  color: #fff;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0) 60%),
+    linear-gradient(120deg, var(--brand-deep) 0%, var(--brand) 60%, #e8101f 100%);
+  box-shadow: 0 18px 40px rgba(179, 0, 27, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  font-size: 1em;
+}
+
+.tarjeta-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tarjeta-logo {
+  display: block;
+  height: 1.6em;
+  width: auto;
+}
+
+.tarjeta-tipo {
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.95;
+}
+
+.tarjeta-chip {
+  width: 2.6em;
+  height: auto;
+  color: #f6d46a;
+  border-radius: 0.4em;
+}
+
+.tarjeta-numero {
+  font-size: 1.45em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: letter-spacing var(--dur) var(--ease);
+}
+
+.tarjeta-pie {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.tarjeta-dato {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tarjeta-etiqueta {
+  font-size: 0.6em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.tarjeta-valor {
+  font-size: 0.95em;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tarjeta-valor--num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.tarjeta-nota {
+  margin: var(--space-3) 0 var(--space-4);
+  font-size: 0.88em;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+[data-profile="sencillo"] .tarjeta-modal {
+  max-width: 560px;
+}
+
+[data-profile="sencillo"] .tarjeta {
+  font-size: 0.85em; /* con escala 1.5 el número de 19 caracteres no cabe a 1em */
+  border-radius: 14px;
+  border: 2px solid #ffffff;
+  box-shadow: none;
+  background: var(--brand);
+}
+
+[data-profile="sencillo"] .tarjeta-nota {
+  color: var(--text);
+}
+
+@media (max-width: 420px) {
+  .tarjeta {
+    font-size: 0.85em;
+  }
+}
+
+/* Movimiento reducido: sin entradas, brillos ni ondas; los estados se ven igual. */
+
 @media (prefers-reduced-motion: reduce) {
+  .a2ui-column > *,
+  .a2ui-modal,
+  .a2ui-modal-overlay {
+    animation: none;
+  }
+  .a2ui-skeleton-linea {
+    animation: none;
+    background: #e9e9e9;
+  }
+  .a2ui-aviso::before {
+    animation: none;
+  }
+  .a2ui-chip:hover .a2ui-chip-icono,
+  .a2ui-slider input[type="range"]:active::-webkit-slider-thumb {
+    transform: none;
+  }
+  .a2ui-voz--cargando {
+    animation: none;
+    opacity: 0.5;
+  }
+  .a2ui-voz--auto.a2ui-voz--reproduciendo {
+    animation: none;
+    box-shadow: 0 0 0 3px rgba(228, 0, 27, 0.35);
+  }
   .pixy-circulo {
     animation: none;
   }

@@ -27,11 +27,12 @@ export function ActionConfirmationModal({ node, onEvento }: A2UIComponentProps) 
     cancelLabel?: string;
     action?: string;
   };
+  const tituloId = `${node.id}-titulo`;
 
   return (
     <div className="a2ui-modal-overlay">
-      <div className="a2ui-card a2ui-modal">
-        {title && <h3>{title}</h3>}
+      <div className="a2ui-card a2ui-modal" role="dialog" aria-modal="true" aria-labelledby={title ? tituloId : undefined}>
+        {title && <h3 id={tituloId}>{title}</h3>}
         <ul className="a2ui-modal-resumen">
           {(summary ?? []).map((s, i) => (
             <li key={i}>

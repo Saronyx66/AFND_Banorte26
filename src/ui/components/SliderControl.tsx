@@ -39,20 +39,31 @@ export function SliderControl({ node, onEvento }: A2UIComponentProps) {
     }, debounceMs ?? 200);
   }
 
+  const lo = min ?? 0;
+  const hi = max ?? 100;
+  // D30: porcentaje recorrido para pintar el relleno de la pista (solo presentación).
+  const pct = hi > lo ? Math.min(100, Math.max(0, ((local - lo) / (hi - lo)) * 100)) : 0;
+
   return (
     <div className="a2ui-card a2ui-slider">
       <label htmlFor={node.id}>
-        {label}: <strong>{formatearValor(local, format)}</strong>
+        <span>{label}</span>
+        <strong className="a2ui-slider-valor">{formatearValor(local, format)}</strong>
       </label>
       <input
         id={node.id}
         type="range"
-        min={min ?? 0}
-        max={max ?? 100}
+        min={lo}
+        max={hi}
         step={step ?? 1}
         value={local}
         onChange={onChange}
+        style={{ "--pct": `${pct}%` } as React.CSSProperties}
       />
+      <div className="a2ui-slider-extremos" aria-hidden="true">
+        <span>{formatearValor(lo, format)}</span>
+        <span>{formatearValor(hi, format)}</span>
+      </div>
     </div>
   );
 }

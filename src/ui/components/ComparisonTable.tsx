@@ -57,44 +57,71 @@ export function ComparisonTable({ node, onEvento }: A2UIComponentProps) {
 
   const cols = columns ?? [];
   const filas = rows ?? [];
+  // D30: solo la tabla con action es un selector (cursor, hover, foco y
+  // teclado). Con action null (desglose de gastos, D24) es solo lectura.
+  const activa = Boolean(action);
 
   return (
-    <div className="a2ui-card a2ui-comparison">
-      <table>
-        <thead>
-          <tr>
-            {cols.map((c) => (
-              <th key={c.key}>{c.label}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {filas.map((fila, i) => {
-            const key = String(fila.id ?? fila.key ?? i);
-            const seleccionada = selectedKey !== undefined && key === selectedKey;
-            const atenuada =
-              typeof presupuesto === "number" &&
-              typeof fila.pago_mensual === "number" &&
-              fila.pago_mensual > presupuesto;
-            return (
-              <tr
-                key={key}
-                className={[seleccionada && "a2ui-selected", atenuada && "a2ui-atenuada"]
-                  .filter(Boolean)
-                  .join(" ")}
-                onClick={() => action && onEvento(node.id, action, { plan_id: key })}
-              >
-                {cols.map((c, ci) => (
-                  <td key={c.key}>
-                    <Celda valor={fila[c.key]} format={c.format} />
-                    {ci === 0 && fila.recomendado ? <span className="a2ui-badge">Recomendado</span> : null}
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <div className={`a2ui-card a2ui-comparison${activa ? " a2ui-comparison--activa" : ""}`}>
+      <div className="a2ui-tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              {cols.map((c) => (
+                <th key={c.key} scope="col">
+                  {c.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filas.map((fila, i) => {
+              const key = String(fila.id ?? fila.key ?? i);
+              const seleccionada = selectedKey !== undefined && key === selectedKey;
+              const atenuada =
+                typeof presupuesto === "number" &&
+                typeof fila.pago_mensual === "number" &&
+                fila.pago_mensual > presupuesto;
+              const elegir = () => action && onEvento(node.id, action, { plan_id: key });
+              return (
+                <tr
+                  key={key}
+                  className={[seleccionada && "a2ui-selected", atenuada && "a2ui-atenuada"]
+                    .filter(Boolean)
+                    .join(" ")}
+                  onClick={elegir}
+                  tabIndex={activa ? 0 : undefined}
+                  aria-selected={activa ? seleccionada : undefined}
+                  onKeyDown={
+                    activa
+                      ? (e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            elegir();
+                          }
+                        }
+                      : undefined
+                  }
+                >
+                  {cols.map((c, ci) => (
+                    <td key={c.key}>
+                      <Celda valor={fila[c.key]} format={c.format} />
+                      {ci === 0 && fila.recomendado ? (
+                        <span className="a2ui-badge">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m5 12 5 5L20 7" />
+                          </svg>
+                          Recomendado
+                        </span>
+                      ) : null}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

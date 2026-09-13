@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { store } from "./store";
 import { sendEvent } from "./sendEvent";
 import { COMPONENTS } from "./components";
 import { TextInput } from "./TextInput";
 import { PixyBubble } from "./PixyBubble";
+import { TarjetaDigital } from "./TarjetaDigital";
 import type { A2UIMessage, ComponentNode, Profile } from "@/src/lib/a2ui";
 import type { OnEvento } from "./types";
 
@@ -18,6 +19,8 @@ export function AppRenderer() {
   const [profile, setProfile] = useState<Profile>("normal");
   const [conectado, setConectado] = useState(false);
   const [pensando, setPensando] = useState(false);
+  const [tarjetaAbierta, setTarjetaAbierta] = useState(false); // D31: tarjeta digital, shell
+  const cerrarTarjeta = useCallback(() => setTarjetaAbierta(false), []); // estable: el modal lo usa en un efecto
   const reintentoRef = useRef(1000);
   // Espejos del estado para decidir dentro del handler del EventSource sin
   // depender de closures viejos.
@@ -110,20 +113,57 @@ export function AppRenderer() {
           {/* D26: logo oficial, blanco sobre el rojo. */}
           <img className="a2ui-header-logo" src="/logo-banorte.svg" alt="Banorte" />
           <span className="a2ui-header-separador" aria-hidden="true" />
-          <span className="a2ui-header-saludo">Buen día, Sofía</span>
+          <span className="a2ui-header-saludo">
+            <span className="a2ui-header-saludo-hora">Buen día</span>
+            <span className="a2ui-header-saludo-nombre">Sofía</span>
+          </span>
         </div>
         <div className="a2ui-header-info">
-          <span className="a2ui-header-tarjeta">•••• 4321</span>
+          {/* D31: el chip abre la tarjeta digital (número, vigencia y CVV bajo demanda). */}
+          <button
+            type="button"
+            className="a2ui-header-tarjeta"
+            aria-label="Ver mi tarjeta, terminación 4321"
+            aria-haspopup="dialog"
+            aria-expanded={tarjetaAbierta}
+            onClick={() => setTarjetaAbierta(true)}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <path d="M2 10h20" />
+            </svg>
+            •••• 4321
+          </button>
         </div>
       </header>
 
-      {!conectado && <div className="a2ui-aviso">Reconectando…</div>}
+      <TarjetaDigital abierta={tarjetaAbierta} onCerrar={cerrarTarjeta} />
 
-      <main className="a2ui-main">{root ? <NodoRenderer node={root} onEvento={onEvento} /> : <p>Cargando…</p>}</main>
+      {!conectado && <div className="a2ui-aviso" role="status">Reconectando…</div>}
+
+      <main className="a2ui-main">{root ? <NodoRenderer node={root} onEvento={onEvento} /> : <Esqueleto />}</main>
 
       <PixyBubble estado={pensando ? "pensando" : "reposo"} />
 
       <TextInput disabled={pensando} onEnviar={(texto) => onEvento("input-texto", "mensaje_libre", { texto })} />
+    </div>
+  );
+}
+
+// Esqueleto de la primera pantalla (D30): mismo ritmo visual que las tarjetas
+// que van a llegar, en vez de un "Cargando…" suelto. Solo presentación.
+function Esqueleto() {
+  return (
+    <div className="a2ui-skeleton" role="status" aria-live="polite" aria-label="Cargando">
+      <div className="a2ui-skeleton-card">
+        <span className="a2ui-skeleton-linea a2ui-skeleton-linea--titulo" />
+        <span className="a2ui-skeleton-linea" />
+        <span className="a2ui-skeleton-linea a2ui-skeleton-linea--corta" />
+      </div>
+      <div className="a2ui-skeleton-card">
+        <span className="a2ui-skeleton-linea a2ui-skeleton-linea--titulo" />
+        <span className="a2ui-skeleton-linea a2ui-skeleton-linea--valor" />
+      </div>
     </div>
   );
 }
